@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+{% extends 'star/Base.html'%}
+{% load staticfiles %}
+{%block child_block%}
+<h1>Student Registration Form</h1>
+<form method="post">
+    {{form.as_p}}
+    {% csrf_token %}
+    <input type = 'submit' class="btn btn-primary" value="submit">
+</form>
+{%endblock%}
