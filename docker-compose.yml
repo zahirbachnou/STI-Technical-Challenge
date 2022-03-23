@@ -2,8 +2,8 @@ version: "3"
 services:
   db:
     image: postgres
-    ports:
-      - 5432:5432
+    expose:
+      - "5432"
     restart: always
     environment:
       - POSTGRES_USER=postgres
@@ -12,15 +12,28 @@ services:
     volumes: 
       - db:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    networks:
+      - traefik
   web:
     build: ./Registration
     command: python ./Registration/manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     depends_on:
       - db
+    labels:
+      - "traefik.docker.network=traefik"
+      - "traefik.backend=registration"
+      - "traefik.frontend.rule=Host:registration.localhost"
+      - "traefik.port=8000"
+    networks:
+      - traefik
 volumes:
   db:
     driver: local
+networks:
+  traefik:
+    external:
+      name: traefik_webgateway
